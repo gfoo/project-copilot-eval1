@@ -275,4 +275,30 @@ class NewsMapperTest {
 
         assertEquals("news", response.type());
     }
+
+    @Test
+    void testNullObjectId() {
+        NewsDocument newsDocument = new NewsDocument();
+        newsDocument.id = null;
+        newsDocument.title = "News without ID";
+        newsDocument.isEvent = false;
+
+        NewsResponse response = newsMapper.toResponse(newsDocument);
+
+        assertNotNull(response);
+        assertNull(response.id());
+    }
+
+    @Test
+    void testNullIsEvent() {
+        NewsDocument newsDocument = new NewsDocument();
+        newsDocument.id = new ObjectId();
+        newsDocument.title = "News without isEvent";
+        newsDocument.isEvent = null;
+
+        NewsResponse response = newsMapper.toResponse(newsDocument);
+
+        assertNotNull(response);
+        assertNull(response.type());
+    }
 }

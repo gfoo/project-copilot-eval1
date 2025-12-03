@@ -10,8 +10,8 @@ import java.util.List;
 @Mapper(componentModel = "cdi")
 public interface NewsMapper {
     
-    @Mapping(target = "id", expression = "java(document.id.toString())")
-    @Mapping(target = "type", expression = "java(document.isEvent ? \"event\" : \"news\")")
+    @Mapping(target = "id", expression = "java(document.id != null ? document.id.toString() : null)")
+    @Mapping(target = "type", expression = "java(document.isEvent != null ? (document.isEvent ? \"event\" : \"news\") : null)")
     NewsResponse toResponse(NewsDocument document);
     
     List<NewsResponse> toResponseList(List<NewsDocument> documents);
