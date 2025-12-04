@@ -205,4 +205,20 @@ class NewsRepositoryTest {
         List<NewsDocument> lastPage = query.page(Page.of(2, 2)).list();
         assertEquals(1, lastPage.size());
     }
+
+    @Test
+    void testFindByLanguageWithNull() {
+        // Test that null language throws IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () -> {
+            newsRepository.findByLanguage(null);
+        });
+    }
+
+    @Test
+    void testFindByStatusWithNull() {
+        // Test that null status throws IllegalArgumentException
+        assertThrows(IllegalArgumentException.class, () -> {
+            newsRepository.findByStatus(null);
+        });
+    }
 }

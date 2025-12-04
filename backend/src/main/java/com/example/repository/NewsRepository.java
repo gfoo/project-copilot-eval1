@@ -9,10 +9,16 @@ import java.util.List;
 public class NewsRepository implements PanacheMongoRepository<NewsDocument> {
     
     public List<NewsDocument> findByLanguage(String language) {
+        if (language == null) {
+            throw new IllegalArgumentException("Language cannot be null");
+        }
         return list("language", language);
     }
     
     public List<NewsDocument> findByStatus(String status) {
+        if (status == null) {
+            throw new IllegalArgumentException("Status cannot be null");
+        }
         return list("status", status);
     }
     
