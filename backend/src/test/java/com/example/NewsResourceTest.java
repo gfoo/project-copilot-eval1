@@ -221,34 +221,34 @@ class NewsResourceTest {
 
     @Test
     void testGetNews_NegativePage() {
-        // Test with negative page number - should return 500 due to IllegalArgumentException
+        // Test with negative page number - should return 400 Bad Request
         given()
             .queryParam("page", -1)
             .queryParam("size", 10)
             .when().get("/news")
             .then()
-            .statusCode(500);
+            .statusCode(400);
     }
 
     @Test
     void testGetNews_NegativeSize() {
-        // Test with negative size - should return 500 due to IllegalArgumentException
+        // Test with negative size - should return 400 Bad Request
         given()
             .queryParam("page", 0)
             .queryParam("size", -1)
             .when().get("/news")
             .then()
-            .statusCode(500);
+            .statusCode(400);
     }
 
     @Test
     void testGetNews_ZeroSize() {
-        // Test with zero size - should return 500 due to IllegalArgumentException
+        // Test with zero size - should return 400 Bad Request
         given()
             .queryParam("page", 0)
             .queryParam("size", 0)
             .when().get("/news")
             .then()
-            .statusCode(500);
+            .statusCode(400);
     }
 }

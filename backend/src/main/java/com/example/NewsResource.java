@@ -26,9 +26,15 @@ public class NewsResource {
     public Response getNews(
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("10") int size) {
-        List<NewsResponse> news = newsService.getNews(page, size);
-        long total = newsService.count();
-        return Response.ok(new PagedResponse<>(news, page, size, total)).build();
+        try {
+            List<NewsResponse> news = newsService.getNews(page, size);
+            long total = newsService.count();
+            return Response.ok(new PagedResponse<>(news, page, size, total)).build();
+        } catch (IllegalArgumentException e) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                .entity(e.getMessage())
+                .build();
+        }
     }
     
     @GET
