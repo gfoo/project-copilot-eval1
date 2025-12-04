@@ -7,7 +7,7 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "cdi")
+@Mapper(componentModel = "jakarta-cdi")
 public interface NewsMapper {
     
     @Mapping(target = "id", expression = "java(document.id != null ? document.id.toString() : null)")
