@@ -20,6 +20,12 @@ public class NewsService {
     NewsMapper newsMapper;
     
     public List<NewsResponse> getNews(int page, int size) {
+        if (page < 0) {
+            throw new IllegalArgumentException("Page must be >= 0");
+        }
+        if (size <= 0) {
+            throw new IllegalArgumentException("Size must be > 0");
+        }
         return newsMapper.toResponseList(
             newsRepository.findAll()
                 .page(page, size)
@@ -28,8 +34,16 @@ public class NewsService {
     }
     
     public Optional<NewsResponse> getNewsById(String id) {
-        return newsRepository.findByIdOptional(new ObjectId(id))
-            .map(newsMapper::toResponse);
+        if (id == null || id.trim().isEmpty()) {
+            return Optional.empty();
+        }
+        try {
+            return newsRepository.findByIdOptional(new ObjectId(id))
+                .map(newsMapper::toResponse);
+        } catch (IllegalArgumentException e) {
+            // Invalid ObjectId format
+            return Optional.empty();
+        }
     }
     
     public long count() {

@@ -301,4 +301,60 @@ class NewsServiceTest {
         int paginatedTotal = page1.size() + page2.size() + page3.size();
         assertEquals(allAtOnce.size(), paginatedTotal);
     }
+
+    @Test
+    void testGetNewsWithNegativePage() {
+        // Test with negative page number
+        assertThrows(IllegalArgumentException.class, () -> {
+            newsService.getNews(-1, 10);
+        });
+    }
+
+    @Test
+    void testGetNewsWithNegativeSize() {
+        // Test with negative page size
+        assertThrows(IllegalArgumentException.class, () -> {
+            newsService.getNews(0, -1);
+        });
+    }
+
+    @Test
+    void testGetNewsWithZeroSize() {
+        // Test with zero page size
+        assertThrows(IllegalArgumentException.class, () -> {
+            newsService.getNews(0, 0);
+        });
+    }
+
+    @Test
+    void testGetNewsByIdWithInvalidObjectId() {
+        // Test with invalid ObjectId format
+        Optional<NewsResponse> result = newsService.getNewsById("invalid-id-format");
+        
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testGetNewsByIdWithNull() {
+        // Test with null ID
+        Optional<NewsResponse> result = newsService.getNewsById(null);
+        
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testGetNewsByIdWithEmptyString() {
+        // Test with empty string ID
+        Optional<NewsResponse> result = newsService.getNewsById("");
+        
+        assertFalse(result.isPresent());
+    }
+
+    @Test
+    void testGetNewsByIdWithWhitespaceString() {
+        // Test with whitespace-only ID
+        Optional<NewsResponse> result = newsService.getNewsById("   ");
+        
+        assertFalse(result.isPresent());
+    }
 }
