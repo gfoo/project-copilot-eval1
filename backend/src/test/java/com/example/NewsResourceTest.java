@@ -15,6 +15,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @QuarkusTest
 class NewsResourceTest {
@@ -215,6 +216,39 @@ class NewsResourceTest {
             .path("data.size()");
 
         // Verify consistency
-        assert totalItems == page1Size + page2Size + page3Size;
+        assertEquals(totalItems, page1Size + page2Size + page3Size);
+    }
+
+    @Test
+    void testGetNews_NegativePage() {
+        // Test with negative page number - should return 500 due to IllegalArgumentException
+        given()
+            .queryParam("page", -1)
+            .queryParam("size", 10)
+            .when().get("/news")
+            .then()
+            .statusCode(500);
+    }
+
+    @Test
+    void testGetNews_NegativeSize() {
+        // Test with negative size - should return 500 due to IllegalArgumentException
+        given()
+            .queryParam("page", 0)
+            .queryParam("size", -1)
+            .when().get("/news")
+            .then()
+            .statusCode(500);
+    }
+
+    @Test
+    void testGetNews_ZeroSize() {
+        // Test with zero size - should return 500 due to IllegalArgumentException
+        given()
+            .queryParam("page", 0)
+            .queryParam("size", 0)
+            .when().get("/news")
+            .then()
+            .statusCode(500);
     }
 }
