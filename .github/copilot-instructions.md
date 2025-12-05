@@ -10,6 +10,7 @@
 - When creating issues, use the GitHub CLI (`gh issue create`) to create real issues in the repository.
 - Include clear descriptions, acceptance criteria, and file references when relevant.
 - an issue is always related to an epic (`addSubIssue` api graphql mutation), unless it is specified that it's not necessary
+- sub-issues of an epic must have an order number prefix in title (e.g., "1. First task", "2. Second task"). Use decimal notation for parallelizable tasks (e.g., "2.1", "2.2")
 - the content must @copilot oriented
 - issue is a bug or a enhancement, it must be labeled as such (ask if unsure about the label to use)
 - all issues start with a Todo status for project board view
