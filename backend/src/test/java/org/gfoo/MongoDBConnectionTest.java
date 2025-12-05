@@ -42,5 +42,8 @@ class MongoDBConnectionTest {
         
         // Verify count increased
         assertEquals(1, NewsDocument.count());
+        long count = TestEntity.count();
+        assertEquals(0, count);
+        
     }
 }
