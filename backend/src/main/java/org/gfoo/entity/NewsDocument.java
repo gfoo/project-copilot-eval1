@@ -1,7 +1,7 @@
 package org.gfoo.entity;
 
-import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import io.quarkus.mongodb.panache.common.MongoEntity;
+import io.quarkus.mongodb.panache.PanacheMongoEntity;
 import java.util.Date;
 
 @MongoEntity(collection = "news")
