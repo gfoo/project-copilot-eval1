@@ -1,5 +1,6 @@
 package com.example;
 
+import com.example.entity.NewsDocument;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,34 +13,34 @@ class MongoDBConnectionTest {
     @BeforeEach
     void setup() {
         // Clean up before each test
-        TestEntity.deleteAll();
+        NewsDocument.deleteAll();
     }
 
     @Test
     void testMongoDBConnection() {
         // Test that we can persist and retrieve an entity
-        TestEntity entity = new TestEntity();
-        entity.name = "Test Entity";
+        NewsDocument entity = new NewsDocument();
+        entity.title = "Test Entity";
         entity.persist();
 
         // Verify entity was persisted
-        TestEntity found = TestEntity.findById(entity.id);
+        NewsDocument found = NewsDocument.findById(entity.id);
         assertNotNull(found);
-        assertEquals("Test Entity", found.name);
+        assertEquals("Test Entity", found.title);
     }
 
     @Test
     void testMongoDBCount() {
         // Test basic count operation
-        long count = TestEntity.count();
+        long count = NewsDocument.count();
         assertEquals(0, count);
         
         // Add an entity
-        TestEntity entity = new TestEntity();
-        entity.name = "Test Count";
+        NewsDocument entity = new NewsDocument();
+        entity.title = "Test Count";
         entity.persist();
         
         // Verify count increased
-        assertEquals(1, TestEntity.count());
+        assertEquals(1, NewsDocument.count());
     }
 }
