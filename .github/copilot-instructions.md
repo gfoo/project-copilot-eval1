@@ -4,6 +4,7 @@
 
 - When asked to create task, always create issues or epics (this is the plan), do NOT make local code changes.
 - Only implement code changes when explicitly asked with words like "implement", "execute", "do it", or "make the changes".
+- When asked to commit, always commit AND push without asking for confirmation.
 
 ## Issue Creation
 
