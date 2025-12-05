@@ -6,11 +6,11 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.junit.TestProfile;
 import io.restassured.http.ContentType;
 import jakarta.inject.Inject;
-import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.*;
@@ -21,6 +21,11 @@ import static org.hamcrest.Matchers.hasSize;
 @QuarkusTest
 @TestProfile(MongoTestProfile.class)
 public class NewsResourceIT {
+    
+    private static final int TOTAL_TEST_ITEMS = 18;
+    private static final int TOTAL_NEWS_ITEMS = 10;
+    private static final int TOTAL_EVENT_ITEMS = 8;
+    private static final String INVALID_OBJECT_ID = "000000000000000000000000";
     
     @Inject
     NewsRepository newsRepository;
@@ -36,7 +41,7 @@ public class NewsResourceIT {
         // Mix of language: fr/en
         
         // Create 10 regular news items
-        for (int i = 1; i <= 10; i++) {
+        for (int i = 1; i <= TOTAL_NEWS_ITEMS; i++) {
             NewsDocument news = new NewsDocument();
             news.title = "Breaking News " + i;
             news.catchLine = "Important update about topic " + i;
@@ -45,13 +50,13 @@ public class NewsResourceIT {
             news.status = i % 4 == 0 ? "deleted" : "usable";
             news.userCreated = "admin";
             news.userLastModified = "admin";
-            news.dateCreated = new Date(System.currentTimeMillis() - (i * 86400000L)); // i days ago
+            news.dateCreated = new Date(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(i));
             news.dateLastModified = new Date();
             newsRepository.persist(news);
         }
         
         // Create 8 events
-        for (int i = 1; i <= 8; i++) {
+        for (int i = 1; i <= TOTAL_EVENT_ITEMS; i++) {
             NewsDocument event = new NewsDocument();
             event.title = "Event " + i;
             event.catchLine = "Join us for event " + i;
@@ -60,7 +65,7 @@ public class NewsResourceIT {
             event.status = i % 5 == 0 ? "deleted" : "usable";
             event.userCreated = "eventmanager";
             event.userLastModified = "eventmanager";
-            event.dateCreated = new Date(System.currentTimeMillis() - (i * 43200000L)); // i half-days ago
+            event.dateCreated = new Date(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(12 * i));
             event.dateLastModified = new Date();
             newsRepository.persist(event);
         }
@@ -90,7 +95,7 @@ public class NewsResourceIT {
             .contentType(ContentType.JSON)
             .body("page", equalTo(1))
             .body("size", equalTo(5))
-            .body("total", equalTo(18))
+            .body("total", equalTo(TOTAL_TEST_ITEMS))
             .body("data", hasSize(5));
     }
     
@@ -115,7 +120,7 @@ public class NewsResourceIT {
     @Test
     void testGetNewsById_whenNotExists_shouldReturn404() {
         given()
-            .when().get("/news/000000000000000000000000")
+            .when().get("/news/" + INVALID_OBJECT_ID)
             .then()
             .statusCode(404);
     }
@@ -145,7 +150,7 @@ public class NewsResourceIT {
         NewsDocument eventDoc = newsRepository.listAll().stream()
             .filter(doc -> doc.isEvent != null && doc.isEvent)
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(() -> new AssertionError("Expected to find at least one event document in test data"));
         
         String id = eventDoc.id.toString();
         
@@ -161,7 +166,7 @@ public class NewsResourceIT {
         NewsDocument newsDoc = newsRepository.listAll().stream()
             .filter(doc -> doc.isEvent != null && !doc.isEvent)
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(() -> new AssertionError("Expected to find at least one news document in test data"));
         
         String newsId = newsDoc.id.toString();
         
@@ -176,14 +181,14 @@ public class NewsResourceIT {
     
     @Test
     void testGetNews_defaultPaginationReturns10Items() {
-        // Default pagination should return 10 items even though we have 18
+        // Default pagination should return 10 items even though we have TOTAL_TEST_ITEMS
         given()
             .when().get("/news")
             .then()
             .statusCode(200)
             .contentType(ContentType.JSON)
             .body("data", hasSize(10))
-            .body("total", equalTo(18));
+            .body("total", equalTo(TOTAL_TEST_ITEMS));
     }
     
     @Test
@@ -198,12 +203,13 @@ public class NewsResourceIT {
             .body("page", equalTo(0))
             .body("size", equalTo(5))
             .body("data", hasSize(5))
-            .body("total", equalTo(18));
+            .body("total", equalTo(TOTAL_TEST_ITEMS));
     }
     
     @Test
     void testGetNews_lastPage() {
         // Get the last page with remaining items
+        // With TOTAL_TEST_ITEMS=18, pages 0-2 have 5 each (15 total), page 3 has 3 remaining
         given()
             .queryParam("page", 3)
             .queryParam("size", 5)
@@ -213,8 +219,8 @@ public class NewsResourceIT {
             .contentType(ContentType.JSON)
             .body("page", equalTo(3))
             .body("size", equalTo(5))
-            .body("data", hasSize(3)) // 18 total, pages 0-2 have 5 each (15), page 3 has 3
-            .body("total", equalTo(18));
+            .body("data", hasSize(3))
+            .body("total", equalTo(TOTAL_TEST_ITEMS));
     }
     
     @Test
