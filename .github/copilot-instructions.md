@@ -12,3 +12,4 @@
 - an issue is always related to an epic, unless it is specified that it's not necessary
 - the content must @copilot oriented
 - issue is a bug or a enhancement, it must be labeled as such (ask if unsure about the label to use)
+- all issues start with a Todo status for project board view
