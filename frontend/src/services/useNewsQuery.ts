@@ -6,7 +6,7 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import { fetchNews, fetchNewsById } from '../services/newsApi';
+import { fetchNews, fetchNewsById } from './newsApi';
 
 /**
  * Hook to fetch paginated news articles.
