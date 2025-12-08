@@ -6,7 +6,7 @@ import org.gfoo.entity.NewsDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "cdi")
+@Mapper(componentModel = "jakarta")
 public interface NewsMapper {
 
     @Mapping(target = "id", expression = "java(document.id != null ? document.id.toString() : null)")
