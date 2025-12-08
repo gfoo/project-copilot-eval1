@@ -3,7 +3,6 @@ import { useEffect, useRef, useCallback } from "react";
 import { fetchNews } from "../services/newsApi";
 import NewsCard from "../components/NewsCard";
 import { NewsGridSkeleton } from "../components/NewsCardSkeleton";
-import { NewsGridSkeleton } from "../components/NewsCardSkeleton";
 
 function HomePage() {
   const {
@@ -29,13 +28,13 @@ function HomePage() {
     (node: HTMLDivElement) => {
       if (isLoading) return;
       if (observerRef.current) observerRef.current.disconnect();
-      
+
       observerRef.current = new IntersectionObserver((entries) => {
         if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
           fetchNextPage();
         }
       });
-      
+
       if (node) observerRef.current.observe(node);
     },
     [isLoading, hasNextPage, isFetchingNextPage, fetchNextPage]
@@ -75,7 +74,12 @@ function HomePage() {
           <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-center">
             <div className="flex flex-col items-center">
               <div className="flex-shrink-0 mb-4">
-                <svg className="h-12 w-12 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <svg
+                  className="h-12 w-12 text-red-400"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                >
                   <circle cx="12" cy="12" r="10"></circle>
                   <line x1="15" y1="9" x2="9" y2="15"></line>
                   <line x1="9" y1="9" x2="15" y2="15"></line>
@@ -85,9 +89,11 @@ function HomePage() {
                 Erreur lors du chargement
               </h3>
               <p className="text-red-700 mb-4">
-                {error instanceof Error ? error.message : "Une erreur s'est produite lors du chargement des actualités"}
+                {error instanceof Error
+                  ? error.message
+                  : "Une erreur s'est produite lors du chargement des actualités"}
               </p>
-              <button 
+              <button
                 onClick={() => window.location.reload()}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
@@ -117,8 +123,8 @@ function HomePage() {
                     // Add ref to the last element for infinite scroll detection
                     if (index === allNews.length - 1) {
                       return (
-                        <div 
-                          key={news.id} 
+                        <div
+                          key={news.id}
                           ref={lastNewsElementRef}
                           className="transform transition-transform duration-200 hover:scale-[1.02]"
                         >
@@ -127,7 +133,7 @@ function HomePage() {
                       );
                     }
                     return (
-                      <div 
+                      <div
                         key={news.id}
                         className="transform transition-transform duration-200 hover:scale-[1.02]"
                       >
@@ -136,32 +142,42 @@ function HomePage() {
                     );
                   })}
                 </div>
-
-            {/* Loading more indicator */}
-            {isFetchingNextPage && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mt-8">
-                {Array.from({ length: 4 }, (_, index) => (
-                  <div key={index} className="animate-pulse">
-                    <div className="bg-white rounded-lg shadow-sm p-6">
-                      <div className="h-6 bg-gray-200 rounded-full w-20 mb-4"></div>
-                      <div className="space-y-2 mb-4">
-                        <div className="h-6 bg-gray-200 rounded w-full"></div>
-                        <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                {/* Loading more indicator */}
+                {isFetchingNextPage && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mt-8">
+                    {Array.from({ length: 4 }, (_, index) => (
+                      <div key={index} className="animate-pulse">
+                        <div className="bg-white rounded-lg shadow-sm p-6">
+                          <div className="h-6 bg-gray-200 rounded-full w-20 mb-4"></div>
+                          <div className="space-y-2 mb-4">
+                            <div className="h-6 bg-gray-200 rounded w-full"></div>
+                            <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                          </div>
+                          <div className="space-y-2 mb-6">
+                            <div className="h-4 bg-gray-200 rounded w-full"></div>
+                            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                          </div>
+                        </div>
                       </div>
-                      <div className="space-y-2 mb-6">
-                        <div className="h-4 bg-gray-200 rounded w-full"></div>
-                        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            )}                {/* End of data indicator */}
+                )}{" "}
+                {/* End of data indicator */}
                 {!hasNextPage && allNews.length > 0 && (
                   <div className="text-center py-8">
                     <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg">
-                      <svg className="h-4 w-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <svg
+                        className="h-4 w-4 text-gray-500 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
                       </svg>
                       <span className="text-sm text-gray-600">
                         Toutes les actualités ont été chargées
@@ -169,7 +185,6 @@ function HomePage() {
                     </div>
                   </div>
                 )}
-
                 {/* Stats */}
                 <div className="text-center text-sm text-gray-500 mt-4">
                   {allNews.length} sur {totalItems} articles affichés

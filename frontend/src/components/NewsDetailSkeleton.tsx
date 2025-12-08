@@ -6,7 +6,7 @@ function NewsDetailSkeleton() {
         <div className="mb-6 animate-pulse">
           <div className="h-6 bg-gray-200 rounded w-40"></div>
         </div>
-        
+
         <article className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="px-8 py-8 animate-pulse">
             {/* Type badge skeleton */}
