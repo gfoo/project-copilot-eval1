@@ -14,6 +14,8 @@
 - sub-issues of an epic must have an order number prefix in title (e.g., "1. First task", "2. Second task"). Use decimal notation for parallelizable tasks (e.g., "2.1", "2.2")
 - the content must @copilot oriented
 - issue is a bug or a enhancement, it must be labeled as such (ask if unsure about the label to use)
+- epic issues must have the "epic" label
+- epic title always starts with: "[EPIC]"
 - all issues start with a Todo status for project board view
 - when a sub-issue is moved to "In Progress", also move its parent epic to "In Progress"
 - epic is marked "Done" only when all sub-issues are completed
