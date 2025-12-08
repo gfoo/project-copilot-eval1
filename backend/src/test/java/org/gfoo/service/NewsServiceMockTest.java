@@ -4,12 +4,13 @@ import org.gfoo.dto.NewsResponse;
 import org.gfoo.entity.NewsDocument;
 import org.gfoo.mapper.NewsMapper;
 import org.gfoo.repository.NewsRepository;
-import io.quarkus.test.InjectMock;
-import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,16 +22,16 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
-@QuarkusTest
+@ExtendWith(MockitoExtension.class)
 public class NewsServiceMockTest {
     
-    @InjectMock
+    @Mock
     NewsRepository newsRepository;
     
-    @InjectMock
+    @Mock
     NewsMapper newsMapper;
     
-    @Inject
+    @InjectMocks
     NewsService newsService;
     
     @Test
