@@ -2,6 +2,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useCallback } from "react";
 import { fetchNews } from "../services/newsApi";
 import NewsCard from "../components/NewsCard";
+import { NewsGridSkeleton } from "../components/NewsCardSkeleton";
+import { NewsGridSkeleton } from "../components/NewsCardSkeleton";
 
 function HomePage() {
   const {
@@ -66,30 +68,31 @@ function HomePage() {
         </div>
 
         {/* Loading State */}
-        {isLoading && (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            <span className="ml-3 text-gray-600">Chargement des actualités...</span>
-          </div>
-        )}
+        {isLoading && <NewsGridSkeleton count={12} />}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+          <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-center">
+            <div className="flex flex-col items-center">
+              <div className="flex-shrink-0 mb-4">
+                <svg className="h-12 w-12 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
               </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-red-800">
-                  Erreur lors du chargement
-                </h3>
-                <p className="mt-2 text-sm text-red-700">
-                  {error instanceof Error ? error.message : "Une erreur s'est produite"}
-                </p>
-              </div>
+              <h3 className="text-lg font-semibold text-red-900 mb-2">
+                Erreur lors du chargement
+              </h3>
+              <p className="text-red-700 mb-4">
+                {error instanceof Error ? error.message : "Une erreur s'est produite lors du chargement des actualités"}
+              </p>
+              <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Réessayer
+              </button>
             </div>
           </div>
         )}
@@ -108,30 +111,52 @@ function HomePage() {
               </div>
             ) : (
               <>
-                {/* Responsive Grid: 1 col mobile, 2 cols tablet, 3+ cols desktop */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+                {/* Enhanced Responsive Grid with better spacing and hover effects */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-12">
                   {allNews.map((news, index) => {
                     // Add ref to the last element for infinite scroll detection
                     if (index === allNews.length - 1) {
                       return (
-                        <div key={news.id} ref={lastNewsElementRef}>
+                        <div 
+                          key={news.id} 
+                          ref={lastNewsElementRef}
+                          className="transform transition-transform duration-200 hover:scale-[1.02]"
+                        >
                           <NewsCard news={news} />
                         </div>
                       );
                     }
-                    return <NewsCard key={news.id} news={news} />;
+                    return (
+                      <div 
+                        key={news.id}
+                        className="transform transition-transform duration-200 hover:scale-[1.02]"
+                      >
+                        <NewsCard news={news} />
+                      </div>
+                    );
                   })}
                 </div>
 
-                {/* Loading more indicator */}
-                {isFetchingNextPage && (
-                  <div className="flex justify-center items-center py-8">
-                    <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-                    <span className="ml-3 text-gray-600">Chargement d'autres actualités...</span>
+            {/* Loading more indicator */}
+            {isFetchingNextPage && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mt-8">
+                {Array.from({ length: 4 }, (_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="bg-white rounded-lg shadow-sm p-6">
+                      <div className="h-6 bg-gray-200 rounded-full w-20 mb-4"></div>
+                      <div className="space-y-2 mb-4">
+                        <div className="h-6 bg-gray-200 rounded w-full"></div>
+                        <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                      </div>
+                      <div className="space-y-2 mb-6">
+                        <div className="h-4 bg-gray-200 rounded w-full"></div>
+                        <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                      </div>
+                    </div>
                   </div>
-                )}
-
-                {/* End of data indicator */}
+                ))}
+              </div>
+            )}                {/* End of data indicator */}
                 {!hasNextPage && allNews.length > 0 && (
                   <div className="text-center py-8">
                     <div className="inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg">
