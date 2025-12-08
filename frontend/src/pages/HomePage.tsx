@@ -54,24 +54,63 @@ function HomePage() {
   const totalItems = data?.pages[0]?.total ?? 0;
 
   return (
-    <div>
-      <div className="container mx-auto px-4 py-8">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            L'actualité de l'Unil
-          </h1>
-          <p className="text-gray-600">
-            Découvrez les dernières nouvelles et actualités
-          </p>
+    <div className="min-h-screen bg-gray-50">
+      {/* UNIL Blue Top Header with Logo */}
+      <div className="bg-blue-500 py-3 px-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center">
+            <div className="bg-white text-blue-500 px-3 py-1 rounded font-bold text-lg">
+              Unil.
+            </div>
+          </div>
+          <div className="flex items-center space-x-4 text-white">
+            <button className="p-1">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            <button className="p-1">
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
+      </div>
 
+      {/* Main Content Header - White background with black text */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-semibold text-gray-900 mb-1">
+                L'actualité de l'Unil
+              </h1>
+              <p className="text-gray-600 text-sm">Université de Lausanne</p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-500">Toutes les actualités</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      {/* Main content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Loading State */}
         {isLoading && <NewsGridSkeleton count={12} />}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8 text-center">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 mb-8 text-center">
             <div className="flex flex-col items-center">
               <div className="flex-shrink-0 mb-4">
                 <svg
@@ -85,17 +124,17 @@ function HomePage() {
                   <line x1="9" y1="9" x2="15" y2="15"></line>
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-red-900 mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Erreur lors du chargement
               </h3>
-              <p className="text-red-700 mb-4">
+              <p className="text-gray-700 mb-4">
                 {error instanceof Error
                   ? error.message
                   : "Une erreur s'est produite lors du chargement des actualités"}
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 Réessayer
               </button>
@@ -186,14 +225,14 @@ function HomePage() {
                   </div>
                 )}
                 {/* Stats */}
-                <div className="text-center text-sm text-gray-500 mt-4">
+                <div className="text-center text-sm text-gray-500 mt-6">
                   {allNews.length} sur {totalItems} articles affichés
                 </div>
               </>
             )}
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }
