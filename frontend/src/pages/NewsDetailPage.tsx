@@ -28,7 +28,7 @@ function NewsDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         {/* UNIL Blue Top Header with Logo */}
-        <div className="bg-blue-500 py-3 px-4">
+        <div className="bg-unil-blue py-2 px-4">
           <div className="max-w-7xl mx-auto flex items-center justify-between">
             <div className="flex items-center">
               <div className="bg-white text-blue-500 px-3 py-1 rounded font-bold text-lg">
@@ -202,7 +202,7 @@ function NewsDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* UNIL Blue Top Header with Logo */}
-      <div className="bg-blue-500 py-3 px-4">
+      <div className="bg-unil-blue py-2 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
             <div className="bg-white text-blue-500 px-3 py-1 rounded font-bold text-lg">

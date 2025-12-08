@@ -17,19 +17,19 @@
 
 a {
   font-weight: 500;
-  color: #0ea5e9; /* UNIL blue */
+  color: #47a3da; /* UNIL blue */
   text-decoration: inherit;
   transition: color 0.2s ease;
 }
 a:hover {
-  color: #0284c7; /* UNIL blue hover */
+  color: #3590c7; /* UNIL blue hover */
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f9fafb; /* UNIL neutral background */
+  background-color: #f8f9fa; /* UNIL light gray background */
 }
 
 h1,

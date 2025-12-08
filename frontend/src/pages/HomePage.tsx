@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useCallback } from "react";
+import { Link } from "react-router-dom";
 import { fetchNews } from "../services/newsApi";
 import NewsCard from "../components/NewsCard";
 import { NewsGridSkeleton } from "../components/NewsCardSkeleton";
@@ -86,25 +87,36 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Main Content Header - White background with black text */}
+      {/* Main Content Header */}
       <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-semibold text-gray-900 mb-1">
-                L'actualité de l'Unil
-              </h1>
-              <p className="text-gray-600 text-sm">Université de Lausanne</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-500">Toutes les actualités</p>
-            </div>
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-6">
+            L'actualité de l'Unil
+          </h1>
+          <div className="flex items-center gap-4 mb-6">
+            <button className="px-4 py-2 border-2 border-gray-900 rounded-full text-sm font-semibold hover:bg-gray-900 hover:text-white transition-all">
+              Toutes les actualités
+            </button>
+            <button className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center">
+              Facultés
+              <svg
+                className="w-4 h-4 ml-1"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 py-6">
         {/* Loading State */}
         {isLoading && <NewsGridSkeleton count={12} />}
 
@@ -156,30 +168,91 @@ function HomePage() {
               </div>
             ) : (
               <>
-                {/* Enhanced Responsive Grid with better spacing and hover effects */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mb-12">
-                  {allNews.map((news, index) => {
-                    // Add ref to the last element for infinite scroll detection
-                    if (index === allNews.length - 1) {
-                      return (
-                        <div
-                          key={news.id}
-                          ref={lastNewsElementRef}
-                          className="transform transition-transform duration-200 hover:scale-[1.02]"
-                        >
-                          <NewsCard news={news} />
-                        </div>
-                      );
-                    }
-                    return (
-                      <div
-                        key={news.id}
-                        className="transform transition-transform duration-200 hover:scale-[1.02]"
-                      >
-                        <NewsCard news={news} />
+                {/* UNIL-style mixed layout */}
+                <div className="space-y-8">
+                  {/* Featured Article with Image */}
+                  {allNews.slice(0, 1).map((news) => (
+                    <div
+                      key={news.id}
+                      className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8"
+                    >
+                      <div className="relative">
+                        <img
+                          src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=500&h=300&fit=crop"
+                          alt={news.title}
+                          className="w-full h-64 object-cover rounded"
+                        />
                       </div>
-                    );
-                  })}
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4 leading-tight">
+                          <Link
+                            to={`/news/${news.id}`}
+                            className="hover:text-unil-blue"
+                          >
+                            {news.title}
+                          </Link>
+                        </h2>
+                        <p className="text-gray-600 text-base mb-4 leading-relaxed">
+                          {news.catchLine}
+                        </p>
+                        <div className="text-sm text-gray-500 mb-3">
+                          Publié le{" "}
+                          {new Date().toLocaleDateString("fr-FR", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-3 py-1 bg-unil-blue text-white text-xs font-medium rounded">
+                            {news.type}
+                          </span>
+                          <span className="px-3 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                            Recherche
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Grid of smaller articles */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {allNews.slice(1).map((news, index) => {
+                      const isLast = index === allNews.length - 2;
+                      return (
+                        <article
+                          key={news.id}
+                          ref={isLast ? lastNewsElementRef : undefined}
+                          className="space-y-4"
+                        >
+                          <h3 className="text-xl font-bold text-gray-900 leading-tight">
+                            <Link
+                              to={`/news/${news.id}`}
+                              className="hover:text-unil-blue"
+                            >
+                              {news.title}
+                            </Link>
+                          </h3>
+                          <p className="text-gray-600 text-sm leading-relaxed">
+                            {news.catchLine}
+                          </p>
+                          <div className="text-xs text-gray-500 mb-2">
+                            Publié le{" "}
+                            {new Date().toLocaleDateString("fr-FR", {
+                              day: "numeric",
+                              month: "long",
+                              year: "numeric",
+                            })}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <span className="px-2 py-1 bg-unil-blue text-white text-xs font-medium rounded">
+                              {news.type}
+                            </span>
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
                 </div>
                 {/* Loading more indicator */}
                 {isFetchingNextPage && (
