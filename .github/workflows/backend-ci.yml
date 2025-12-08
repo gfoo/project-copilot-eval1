@@ -1,40 +1,70 @@
 name: Backend CI
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
-  pull_request:
-    branches: [main]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
 
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    # Check if backend files changed
+    changes:
+        runs-on: ubuntu-latest
+        outputs:
+            backend: ${{ steps.filter.outputs.backend }}
+        steps:
+            - uses: actions/checkout@v4
+            - uses: dorny/paths-filter@v3
+              id: filter
+              with:
+                  filters: |
+                      backend:
+                        - 'backend/**'
+                        - '.github/workflows/backend-ci.yml'
 
-      - name: Set up JDK 21
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-          cache: 'maven'
+    build-and-test:
+        needs: changes
+        runs-on: ubuntu-latest
+        if: needs.changes.outputs.backend == 'true'
 
-      - name: Build with Maven
-        working-directory: backend
-        run: mvn -B compile
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
 
-      - name: Run tests
-        working-directory: backend
-        run: mvn -B test
+            - name: Set up JDK 21
+              uses: actions/setup-java@v4
+              with:
+                  java-version: "21"
+                  distribution: "temurin"
+                  cache: "maven"
 
-      - name: Package
-        working-directory: backend
-        run: mvn -B package -DskipTests
+            - name: Build with Maven
+              working-directory: backend
+              run: mvn -B compile
+
+            - name: Run tests
+              working-directory: backend
+              run: mvn -B test
+
+            - name: Package
+              working-directory: backend
+              run: mvn -B package -DskipTests
+
+    # This job always runs and reports success - needed for required status checks
+    build-and-test-status:
+        needs: [changes, build-and-test]
+        runs-on: ubuntu-latest
+        if: always()
+        steps:
+            - name: Check status
+              run: |
+                  if [[ "${{ needs.changes.outputs.backend }}" == "false" ]]; then
+                    echo "✅ Skipped - no backend changes"
+                    exit 0
+                  elif [[ "${{ needs.build-and-test.result }}" == "success" ]]; then
+                    echo "✅ Backend build and tests passed"
+                    exit 0
+                  else
+                    echo "❌ Backend build or tests failed"
+                    exit 1
+                  fi
