@@ -14,7 +14,7 @@ function NewsDetailPage() {
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div>
         <div className="container mx-auto px-4 py-8">
           <Link 
             to="/" 
@@ -47,7 +47,7 @@ function NewsDetailPage() {
     const is404 = error instanceof ApiError && error.status === 404;
     
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div>
         <div className="container mx-auto px-4 py-8">
           <Link 
             to="/" 
@@ -95,7 +95,7 @@ function NewsDetailPage() {
 
   // Success state
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <div className="container mx-auto px-4 py-8">
         <Link 
           to="/" 

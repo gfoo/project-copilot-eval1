@@ -53,17 +53,17 @@ function HomePage() {
   const totalItems = data?.pages[0]?.total ?? 0;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <header className="mb-8">
+        {/* Page Header */}
+        <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             L'actualité de l'Unil
           </h1>
           <p className="text-gray-600">
             Découvrez les dernières nouvelles et actualités
           </p>
-        </header>
+        </div>
 
         {/* Loading State */}
         {isLoading && (
