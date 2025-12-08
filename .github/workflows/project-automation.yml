@@ -1,0 +1,140 @@
+name: Project Board Automation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - ready_for_review
+      - closed
+  pull_request_review:
+    types:
+      - submitted
+
+env:
+  PROJECT_NUMBER: 1
+  PROJECT_ID: "PVT_kwHOAPPInc4BJwSV"
+  STATUS_FIELD_ID: "PVTSSF_lAHOAPPInc4BJwSVzg50wMg"
+  # Status option IDs (from project field-list)
+  STATUS_TODO: "3b0c2f6f"
+  STATUS_IN_PROGRESS: "933c40a5"
+  STATUS_DONE: "addb6604"
+  STATUS_TO_REVIEW: "5d3b15a0"
+
+jobs:
+  update-project-status:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      repository-projects: write
+    
+    steps:
+      - name: Get linked issue number from PR body
+        id: get-issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prBody = context.payload.pull_request?.body || '';
+            // Match patterns like "Closes #123", "Fixes #123", "Resolves #123"
+            const match = prBody.match(/(?:closes|fixes|resolves)\s+#(\d+)/i);
+            if (match) {
+              console.log(`Found linked issue: #${match[1]}`);
+              return match[1];
+            }
+            console.log('No linked issue found in PR body');
+            return '';
+          result-encoding: string
+
+      - name: Determine target status
+        id: get-status
+        if: steps.get-issue.outputs.result != ''
+        run: |
+          EVENT="${{ github.event_name }}"
+          ACTION="${{ github.event.action }}"
+          MERGED="${{ github.event.pull_request.merged }}"
+          REVIEW_STATE="${{ github.event.review.state }}"
+          
+          echo "Event: $EVENT, Action: $ACTION, Merged: $MERGED, Review: $REVIEW_STATE"
+          
+          if [[ "$EVENT" == "pull_request" && "$ACTION" == "closed" && "$MERGED" == "true" ]]; then
+            echo "status_id=${{ env.STATUS_DONE }}" >> $GITHUB_OUTPUT
+            echo "status_name=Done" >> $GITHUB_OUTPUT
+          elif [[ "$EVENT" == "pull_request_review" && "$REVIEW_STATE" == "changes_requested" ]]; then
+            echo "status_id=${{ env.STATUS_IN_PROGRESS }}" >> $GITHUB_OUTPUT
+            echo "status_name=In Progress" >> $GITHUB_OUTPUT
+          elif [[ "$EVENT" == "pull_request" && ("$ACTION" == "opened" || "$ACTION" == "ready_for_review") ]]; then
+            if [[ -n "${{ env.STATUS_TO_REVIEW }}" ]]; then
+              echo "status_id=${{ env.STATUS_TO_REVIEW }}" >> $GITHUB_OUTPUT
+              echo "status_name=To Review" >> $GITHUB_OUTPUT
+            else
+              echo "::warning::STATUS_TO_REVIEW not set. Please add 'To Review' status to project and update workflow."
+              echo "status_id=" >> $GITHUB_OUTPUT
+            fi
+          else
+            echo "status_id=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Get issue node ID
+        id: get-issue-node
+        if: steps.get-issue.outputs.result != '' && steps.get-status.outputs.status_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ISSUE_NODE_ID=$(gh api graphql -f query='
+            query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                issue(number: $number) {
+                  id
+                }
+              }
+            }
+          ' -f owner="${{ github.repository_owner }}" -f repo="${{ github.event.repository.name }}" -F number=${{ steps.get-issue.outputs.result }} --jq '.data.repository.issue.id')
+          echo "node_id=$ISSUE_NODE_ID" >> $GITHUB_OUTPUT
+
+      - name: Get project item ID
+        id: get-item
+        if: steps.get-issue-node.outputs.node_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ITEM_ID=$(gh api graphql -f query='
+            query($projectId: ID!, $issueId: ID!) {
+              node(id: $projectId) {
+                ... on ProjectV2 {
+                  items(first: 100) {
+                    nodes {
+                      id
+                      content {
+                        ... on Issue {
+                          id
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ' -f projectId="${{ env.PROJECT_ID }}" -f issueId="${{ steps.get-issue-node.outputs.node_id }}" --jq ".data.node.items.nodes[] | select(.content.id == \"${{ steps.get-issue-node.outputs.node_id }}\") | .id")
+          echo "item_id=$ITEM_ID" >> $GITHUB_OUTPUT
+
+      - name: Update issue status on project board
+        if: steps.get-item.outputs.item_id != '' && steps.get-status.outputs.status_id != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Moving issue #${{ steps.get-issue.outputs.result }} to ${{ steps.get-status.outputs.status_name }}"
+          gh api graphql -f query='
+            mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $optionId: String!) {
+              updateProjectV2ItemFieldValue(input: {
+                projectId: $projectId
+                itemId: $itemId
+                fieldId: $fieldId
+                value: { singleSelectOptionId: $optionId }
+              }) {
+                projectV2Item {
+                  id
+                }
+              }
+            }
+          ' -f projectId="${{ env.PROJECT_ID }}" -f itemId="${{ steps.get-item.outputs.item_id }}" -f fieldId="${{ env.STATUS_FIELD_ID }}" -f optionId="${{ steps.get-status.outputs.status_id }}"
+          echo "✅ Issue #${{ steps.get-issue.outputs.result }} moved to ${{ steps.get-status.outputs.status_name }}"
